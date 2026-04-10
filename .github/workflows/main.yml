@@ -7,43 +7,65 @@ on:
     branches: [main]
 
 jobs:
+  # Job de test et build du backend Java/Spring Boot
   backend:
-    name: Backend Gradle build + tests
-    runs-on: ubuntu-latest
+    name: Backend Gradle build + tests + SonarCloud
+    runs-on: ubuntu-latest  # Exécution sur Ubuntu dernière version
 
     steps:
+      # Récupération du code source depuis le repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Configuration de l'environnement Java
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: temurin  # Utilisation d'Eclipse Temurin (OpenJDK)
           java-version: '17'
 
+      # Mise en cache des dépendances Gradle pour accélérer les builds
       - name: Cache Gradle packages
         uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
+          key: gradle-${{ runner.os }}-${{ hashFiles('back/**/build.gradle', 'back/**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: Run tests and generate coverage
+      # Exécution des tests unitaires et génération des rapports de couverture
+      - name: Run backend tests and generate coverage
+        working-directory: back  # Exécution dans le répertoire backend
         run: |
-          chmod +x ./gradlew
-          ./gradlew clean test jacocoTestReport --no-daemon
+          chmod +x ./gradlew  # Rendre le script Gradle exécutable
+          ./gradlew clean test jacocoTestReport --no-daemon  # Tests + couverture JaCoCo
 
-      - name: Upload coverage report
+      # Build du backend (JAR)
+      - name: Build backend JAR
+        working-directory: back
+        run: ./gradlew build -x test --no-daemon
+
+      # Upload des rapports de couverture pour visualisation dans GitHub
+      - name: Upload backend coverage report
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-report
-          path: build/reports/jacoco/test
+          path: back/build/reports/jacoco/test
 
-      - name: SonarCloud Scan
+      # Upload du JAR compilé pour utilisation dans le deploy
+      - name: Upload backend JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: back/build/libs/microcrm-0.0.1-SNAPSHOT.jar
+          retention-days: 1  # Garder seulement 1 jour, c'est temporaire
+
+      # Analyse de qualité du code avec SonarCloud
+      - name: SonarCloud Scan for Backend
+        working-directory: back
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonar --no-daemon
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Token GitHub pour l'intégration
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Token SonarCloud pour l'analyse
+        run: ./gradlew sonar --no-daemon  # Exécution de l'analyse SonarQube
