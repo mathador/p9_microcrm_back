@@ -1,5 +1,2 @@
-/back/.gradle
-/back/build
-/front/dist
-/front/node_modules
-/front/.angular
+/.gradle
+/build

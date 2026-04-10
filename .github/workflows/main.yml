@@ -31,7 +31,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('back/**/build.gradle', 'back/**/gradle-wrapper.properties') }}
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/build.gradle', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-${{ runner.os }}-
 
@@ -52,14 +52,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-coverage-report
-          path: back/build/reports/jacoco/test
+          path: build/reports/jacoco/test
 
       # Upload du JAR compilé pour utilisation dans le deploy
       - name: Upload backend JAR artifact
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path: back/build/libs/microcrm-0.0.1-SNAPSHOT.jar
+          path: build/libs/microcrm-0.0.1-SNAPSHOT.jar
           retention-days: 1  # Garder seulement 1 jour, c'est temporaire
 
       # Analyse de qualité du code avec SonarCloud
