@@ -54,5 +54,3 @@ docker run -it --rm -p 8080:8080 orion-microcrm-back:latest
 ```
 
 L'API sera disponible sur http://localhost:8080.
-
-Fin
