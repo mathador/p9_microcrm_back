@@ -1,0 +1,43 @@
+graph TD
+    %% Déclencheurs de la pipeline
+    A[Push/PR sur main] --> B{backend job}
+
+    %% Subgraph CI (Continuous Integration)
+    subgraph CI["🔄 Continuous Integration"]
+        B --> C[Checkout repository]
+        C --> D[Set up JDK 17]
+        D --> E[Cache Gradle packages]
+        E --> F[Run tests + coverage<br/>jacocoTestReport]
+        F --> G{Tests réussis?}
+        G -->|✅ Oui| H[Verify tests passed<br/>✅ Tests réussis]
+        G -->|❌ Non| I[Tests failed - Block deployment<br/>❌ Échec + exit 1]
+        H --> J[Build backend JAR<br/>-x test]
+        J --> K[Upload coverage report]
+        K --> L[Upload JAR artifact]
+        L --> M[SonarCloud Scan<br/>Analyse qualité code]
+    end
+
+    %% Connexion CI vers CD avec condition
+    M --> N{Conditions CD?}
+    N -->|✅ backend.result == 'success'<br/>&& push sur main<br/>&& pas PR| O[deploy job]
+
+    %% Subgraph CD (Continuous Deployment)
+    subgraph CD["🚀 Continuous Deployment"]
+        O --> P[Checkout repository]
+        P --> Q[Download JAR artifact]
+        Q --> R[Set up Docker Buildx]
+        R --> S[Login to GHCR]
+        S --> T[Extract metadata<br/>pour tagging]
+        T --> U[Build & Push Docker image<br/>multi-platform<br/>linux/amd64,arm64]
+        U --> V[✅ Image déployée<br/>sur GHCR]
+    end
+
+    %% Styles pour les nœuds d'échec
+    classDef failure fill:#ff6b6b,stroke:#d63031,color:#fff
+    classDef success fill:#51cf66,stroke:#40c057,color:#fff
+    classDef condition fill:#ffd43b,stroke:#fab005,color:#000
+
+    I:::failure
+    H:::success
+    N:::condition
+    V:::success
