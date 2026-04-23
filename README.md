@@ -1,5 +1,10 @@
 # MicroCRM - Backend
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mathador_p9_microcrm_back&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mathador_p9_microcrm_back)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=mathador_p9_microcrm_back&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=mathador_p9_microcrm_back)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=mathador_p9_microcrm_back&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=mathador_p9_microcrm_back)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=mathador_p9_microcrm_back&metric=coverage)](https://sonarcloud.io/summary/new_code?id=mathador_p9_microcrm_back)
+
 Ce projet est la partie Backend de l'application MicroCRM, développée avec Spring Boot (Java 17).
 
 ## Prérequis
